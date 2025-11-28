@@ -20,17 +20,23 @@ import {
   ResponsiveContainer, 
   PieChart as RechartsPie, 
   Pie, 
-  Cell 
+  Cell,
+  LabelList
 } from 'recharts';
 import { PLATFORM_DATA, VIEWS_DATA, GROWTH_DATA, COLORS } from './constants';
 import { PlatformSection } from './components/PlatformSection';
 
 // A4 Wrapper Component
 const A4Page = ({ children, className = '' }: { children?: React.ReactNode; className?: string }) => (
-  <div className={`w-full max-w-[210mm] min-h-[297mm] mx-auto bg-white shadow-lg print-shadow-none print:w-full print:max-w-none p-8 md:p-12 mb-8 ${className}`}>
+  <div className={`w-full max-w-[210mm] min-h-[297mm] mx-auto bg-slate-950 shadow-2xl print-shadow-none print:w-full print:max-w-none p-8 md:p-12 mb-8 border border-slate-900 ${className}`}>
     {children}
   </div>
 );
+
+// Custom palette for the charts to ensure visual distinction and pop in dark mode
+const CHART_COLORS = {
+  pie: ['#E1306C', '#3b82f6', '#06b6d4'], // Instagram Pink, Bright Blue, Cyan (for contrast)
+};
 
 function App() {
   const handlePrint = () => {
@@ -38,13 +44,13 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen py-8 print:py-0">
+    <div className="min-h-screen py-8 print:py-0 bg-black">
       
       {/* Control Bar (Hidden on Print) */}
       <div className="fixed top-4 right-4 z-50 no-print">
         <button 
           onClick={handlePrint}
-          className="bg-blue-900 text-white px-4 py-2 rounded-full shadow-lg flex items-center gap-2 hover:bg-blue-800 transition-colors text-sm font-medium"
+          className="bg-blue-600 text-white px-4 py-2 rounded-full shadow-lg flex items-center gap-2 hover:bg-blue-500 transition-colors text-sm font-medium border border-blue-400"
         >
           <Download size={16} />
           Export PDF
@@ -54,10 +60,10 @@ function App() {
       {/* ================= PAGE 1 ================= */}
       <A4Page>
         {/* Header */}
-        <header className="flex justify-between items-start mb-12 border-b-4 border-blue-900 pb-6">
+        <header className="flex justify-between items-start mb-12 border-b-4 border-white pb-6">
           <div>
-            <h1 className="text-4xl font-extrabold text-slate-900 mb-2 tracking-tight">Monthly Social<br/>Content Wrap</h1>
-            <div className="flex items-center gap-2 text-gray-500 font-medium mt-2">
+            <h1 className="text-4xl font-extrabold text-white mb-2 tracking-tight">Monthly Social<br/>Content Wrap</h1>
+            <div className="flex items-center gap-2 text-slate-400 font-medium mt-2">
               <Calendar size={18} />
               <span>October 2025</span>
             </div>
@@ -67,22 +73,22 @@ function App() {
                <div className="h-2 w-8 bg-yellow-400"></div>
                <div className="h-2 w-8 bg-red-600"></div>
              </div>
-             <h2 className="text-sm font-bold text-gray-400 uppercase tracking-widest">Performance Report</h2>
-             <p className="text-xs text-gray-400">Blue Dart / DHL Logistics</p>
+             <h2 className="text-sm font-bold text-slate-500 uppercase tracking-widest">Performance Report</h2>
+             <p className="text-xs text-slate-600">Blue Dart / DHL Logistics</p>
           </div>
         </header>
 
         {/* Executive Summary Graphs */}
         <section className="mb-10">
-          <h2 className="text-xl font-bold text-gray-800 mb-6 flex items-center gap-2">
-            <BarChart3 className="text-blue-900" />
+          <h2 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
+            <BarChart3 className="text-blue-500" />
             Executive Summary
           </h2>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 h-64">
             {/* Chart 1: Share of Views */}
-            <div className="bg-gray-50 rounded-xl p-4 border border-gray-100 flex flex-col">
-              <h3 className="text-sm font-semibold text-gray-600 mb-4 text-center">Share of Total Views/Impressions</h3>
+            <div className="bg-slate-900 rounded-xl p-4 border border-slate-800 flex flex-col shadow-lg">
+              <h3 className="text-sm font-semibold text-slate-300 mb-4 text-center">Share of Total Views/Impressions</h3>
               <div className="flex-1 w-full h-full min-h-[180px]">
                 <ResponsiveContainer width="100%" height="100%">
                   <RechartsPie>
@@ -90,39 +96,63 @@ function App() {
                       data={VIEWS_DATA}
                       cx="50%"
                       cy="50%"
-                      innerRadius={50}
-                      outerRadius={70}
+                      innerRadius={45}
+                      outerRadius={65}
                       paddingAngle={5}
                       dataKey="value"
+                      label={({ percent }) => `${(percent * 100).toFixed(0)}%`}
+                      labelLine={{ stroke: '#94a3b8' }}
+                      stroke="none"
                     >
                       {VIEWS_DATA.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={index === 0 ? COLORS.instagram : index === 1 ? COLORS.facebook : COLORS.linkedin} />
+                        <Cell key={`cell-${index}`} fill={CHART_COLORS.pie[index % CHART_COLORS.pie.length]} />
                       ))}
                     </Pie>
-                    <Tooltip formatter={(value) => new Intl.NumberFormat('en-US', { notation: "compact", compactDisplay: "short" }).format(Number(value))} />
-                    <Legend verticalAlign="bottom" height={36} iconType="circle" />
+                    <Tooltip 
+                      contentStyle={{ backgroundColor: '#1e293b', borderColor: '#334155', color: '#f8fafc', borderRadius: '8px' }}
+                      formatter={(value) => new Intl.NumberFormat('en-US', { notation: "compact", compactDisplay: "short" }).format(Number(value))} 
+                    />
+                    <Legend verticalAlign="bottom" height={36} iconType="circle" wrapperStyle={{ color: '#94a3b8' }} />
                   </RechartsPie>
                 </ResponsiveContainer>
               </div>
             </div>
 
             {/* Chart 2: Growth Comparison */}
-            <div className="bg-gray-50 rounded-xl p-4 border border-gray-100 flex flex-col">
-              <h3 className="text-sm font-semibold text-gray-600 mb-4 text-center">Month-over-Month Growth (k)</h3>
+            <div className="bg-slate-900 rounded-xl p-4 border border-slate-800 flex flex-col shadow-lg">
+              <h3 className="text-sm font-semibold text-slate-300 mb-4 text-center">Month-over-Month Growth (k)</h3>
                <div className="flex-1 w-full h-full min-h-[180px]">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart
                     data={GROWTH_DATA}
-                    margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+                    margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
                     barGap={0}
                   >
-                    <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                    <XAxis dataKey="name" tick={{fontSize: 10}} axisLine={false} tickLine={false} />
-                    <YAxis tick={{fontSize: 10}} axisLine={false} tickLine={false} />
-                    <Tooltip cursor={{fill: 'transparent'}} />
-                    <Legend iconType="circle" wrapperStyle={{fontSize: '12px'}} />
-                    <Bar dataKey="previous" name="Sept (Est.)" fill="#cbd5e1" radius={[4, 4, 0, 0]} />
-                    <Bar dataKey="current" name="October" fill="#1e3a8a" radius={[4, 4, 0, 0]} />
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#334155" />
+                    <XAxis dataKey="name" tick={{fontSize: 10, fill: '#94a3b8'}} axisLine={false} tickLine={false} />
+                    <YAxis tick={{fontSize: 10, fill: '#94a3b8'}} axisLine={false} tickLine={false} hide />
+                    <Tooltip cursor={{fill: '#334155', opacity: 0.4}} contentStyle={{ backgroundColor: '#1e293b', borderColor: '#334155', color: '#f8fafc', borderRadius: '8px' }} />
+                    <Legend iconType="circle" wrapperStyle={{fontSize: '12px', color: '#94a3b8'}} />
+                    <Bar dataKey="previous" name="Sept (Est.)" radius={[4, 4, 0, 0]}>
+                      {GROWTH_DATA.map((entry, index) => (
+                        <Cell 
+                          key={`cell-prev-${index}`} 
+                          fill={CHART_COLORS.pie[index % CHART_COLORS.pie.length]} 
+                          fillOpacity={0.3}
+                          stroke={CHART_COLORS.pie[index % CHART_COLORS.pie.length]}
+                        />
+                      ))}
+                      <LabelList dataKey="previous" position="top" fontSize={10} fill="#94a3b8" />
+                    </Bar>
+                    <Bar dataKey="current" name="October" radius={[4, 4, 0, 0]}>
+                      {GROWTH_DATA.map((entry, index) => (
+                        <Cell 
+                          key={`cell-curr-${index}`} 
+                          fill={CHART_COLORS.pie[index % CHART_COLORS.pie.length]} 
+                        />
+                      ))}
+                      <LabelList dataKey="current" position="top" fontSize={10} fill="#ffffff" fontWeight="bold" />
+                    </Bar>
                   </BarChart>
                 </ResponsiveContainer>
               </div>
@@ -147,9 +177,9 @@ function App() {
       <div className="page-break"></div>
       
       <A4Page>
-        <div className="flex justify-between items-center mb-8 border-b border-gray-200 pb-4">
-          <h2 className="text-lg font-bold text-gray-400">Monthly Wrap - Page 2</h2>
-          <div className="text-xs text-gray-400">October 2025</div>
+        <div className="flex justify-between items-center mb-8 border-b border-slate-800 pb-4">
+          <h2 className="text-lg font-bold text-slate-600">Monthly Wrap - Page 2</h2>
+          <div className="text-xs text-slate-600">October 2025</div>
         </div>
 
         {/* Remaining Platforms - LinkedIn & X */}
@@ -159,44 +189,14 @@ function App() {
             icon={<Linkedin size={20} />} 
           />
           
-          <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden break-inside-avoid">
-            <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="p-2 rounded-lg text-white" style={{ backgroundColor: PLATFORM_DATA.x.color }}>
-                  <Twitter size={20} />
-                </div>
-                <h3 className="text-lg font-bold text-gray-800">X (Twitter) Overview</h3>
-              </div>
-              <span className="text-xs bg-gray-100 text-gray-500 px-2 py-1 rounded">Limited Data</span>
-            </div>
-            <div className="p-6 flex flex-col md:flex-row gap-8">
-              <div className="flex-1 space-y-4">
-                 <div className="grid grid-cols-2 gap-4">
-                    {PLATFORM_DATA.x.metrics.map((m, idx) => (
-                      <div key={idx} className="p-3 bg-gray-50 rounded border border-gray-100">
-                        <div className="text-xs text-gray-500 uppercase">{m.label}</div>
-                        <div className="font-bold text-lg text-gray-900">{m.value}</div>
-                      </div>
-                    ))}
-                 </div>
-                 <div className="p-4 border border-yellow-200 bg-yellow-50 rounded-lg text-sm text-yellow-800">
-                    <strong>Note:</strong> We need a premium subscription to access professional dashboard analytics. Currently limited to per-post insights.
-                 </div>
-              </div>
-              <div className="flex-1 bg-gray-900 rounded-lg p-4 text-white">
-                <h4 className="font-bold text-sm mb-2 text-gray-300">Top Content</h4>
-                <p className="mb-4 font-serif text-lg leading-relaxed">"Lighting up every corner, one delivery at a time. Happy Diwali!"</p>
-                <div className="flex gap-4 text-xs text-gray-400 border-t border-gray-700 pt-3">
-                   <span>3,468 Impressions</span>
-                   <span>184 Engagement</span>
-                </div>
-              </div>
-            </div>
-          </div>
+          <PlatformSection 
+            data={PLATFORM_DATA.x} 
+            icon={<Twitter size={20} />} 
+          />
         </div>
 
         {/* Global Takeaways */}
-        <section className="bg-slate-900 text-white rounded-2xl p-8 shadow-xl break-inside-avoid">
+        <section className="bg-slate-900 text-white rounded-2xl p-8 shadow-2xl border border-slate-800 break-inside-avoid">
            <h2 className="text-2xl font-bold mb-6 flex items-center gap-3">
              <PieChart className="text-yellow-400" />
              Strategic Conclusions
@@ -208,11 +208,11 @@ function App() {
                 <ul className="space-y-3">
                   <li className="flex gap-3 items-start">
                     <span className="bg-green-500 rounded-full w-2 h-2 mt-2 shrink-0"></span>
-                    <p className="text-gray-300 text-sm"><strong>Human Connection:</strong> Real, human-centric posts significantly outperformed templates and stock imagery across all platforms. Future content should prioritize faces and stories.</p>
+                    <p className="text-slate-300 text-sm"><strong>Human Connection:</strong> Real, human-centric posts significantly outperformed templates and stock imagery across all platforms. Future content should prioritize faces and stories.</p>
                   </li>
                   <li className="flex gap-3 items-start">
                     <span className="bg-green-500 rounded-full w-2 h-2 mt-2 shrink-0"></span>
-                    <p className="text-gray-300 text-sm"><strong>Celebrations Win:</strong> Milestones, awards, and festivals (Diwali) drove the highest engagement spikes.</p>
+                    <p className="text-slate-300 text-sm"><strong>Celebrations Win:</strong> Milestones, awards, and festivals (Diwali) drove the highest engagement spikes.</p>
                   </li>
                 </ul>
               </div>
@@ -222,11 +222,11 @@ function App() {
                 <ul className="space-y-3">
                    <li className="flex gap-3 items-start">
                     <span className="bg-blue-400 rounded-full w-2 h-2 mt-2 shrink-0"></span>
-                    <p className="text-gray-300 text-sm"><strong>LinkedIn:</strong> Unique visitors dropped by ~16%. We need to post more "takeaway-based" content to attract new eyes.</p>
+                    <p className="text-slate-300 text-sm"><strong>LinkedIn:</strong> Unique visitors dropped by ~16%. We need to post more "takeaway-based" content to attract new eyes.</p>
                   </li>
                   <li className="flex gap-3 items-start">
                     <span className="bg-pink-500 rounded-full w-2 h-2 mt-2 shrink-0"></span>
-                    <p className="text-gray-300 text-sm"><strong>Instagram:</strong> Giveaways were missed in October. Reintroducing them is recommended to boost community interaction.</p>
+                    <p className="text-slate-300 text-sm"><strong>Instagram:</strong> Giveaways were missed in October. Reintroducing them is recommended to boost community interaction.</p>
                   </li>
                 </ul>
               </div>
@@ -234,7 +234,7 @@ function App() {
         </section>
         
         {/* Footer */}
-        <footer className="mt-12 pt-6 border-t border-gray-200 text-center text-gray-400 text-xs">
+        <footer className="mt-12 pt-6 border-t border-slate-800 text-center text-slate-600 text-xs">
            <p>© Copyright, Confidential, ConvergenSEE India Martech Pvt. Ltd.</p>
         </footer>
 

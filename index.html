@@ -9,12 +9,15 @@
       @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
       body {
         font-family: 'Inter', sans-serif;
-        background-color: #f3f4f6;
+        background-color: #020617; /* Slate 950 */
+        color: #f8fafc; /* Slate 50 */
       }
       /* Print styles to ensure the two-page layout works when printing to PDF */
       @media print {
         body {
-          background-color: white;
+          background-color: #020617;
+          -webkit-print-color-adjust: exact;
+          print-color-adjust: exact;
         }
         .page-break {
           break-before: page;
@@ -30,10 +33,10 @@
   <script type="importmap">
 {
   "imports": {
-    "lucide-react": "https://aistudiocdn.com/lucide-react@^0.555.0",
-    "react/": "https://aistudiocdn.com/react@^19.2.0/",
     "react": "https://aistudiocdn.com/react@^19.2.0",
     "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
+    "react/": "https://aistudiocdn.com/react@^19.2.0/",
+    "lucide-react": "https://aistudiocdn.com/lucide-react@^0.555.0",
     "recharts": "https://aistudiocdn.com/recharts@^3.5.0"
   }
 }

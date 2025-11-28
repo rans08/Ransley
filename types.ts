@@ -7,16 +7,20 @@ export interface Metric {
   suffix?: string;
 }
 
+export interface ContentHighlight {
+  title: string;
+  stats: string[];
+  description: string;
+  type: 'post' | 'video' | 'poll' | 'info';
+}
+
 export interface PlatformData {
   name: string;
   color: string;
   metrics: Metric[];
-  bestPost?: {
-    title: string;
-    stats: string[];
-    description: string;
-  };
+  contentHighlights?: ContentHighlight[];
   takeaways?: string[];
+  note?: string; // For platform specific warnings/notes (like X)
 }
 
 export interface ChartDataPoint {
